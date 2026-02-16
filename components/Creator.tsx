@@ -10,6 +10,7 @@ const Creator: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedLink, setGeneratedLink] = useState('');
+  const [qrLink, setQrLink] = useState(''); // 短链接专供二维码，避免过长导致白屏
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,14 +46,11 @@ const Creator: React.FC = () => {
     });
   };
 
-  const handleGenerate = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleGenerate = () => {
     if (!name || !date) return;
-    
     setIsGenerating(true);
-    
     setTimeout(() => {
-      const baseUrl = window.location.origin + window.location.pathname;
+      const baseUrl = window.location.origin + (window.location.pathname.replace(/\/$/, '') || '') || window.location.origin;
       const params = new URLSearchParams({
         name,
         date,
@@ -61,7 +59,16 @@ const Creator: React.FC = () => {
         photos: JSON.stringify(photos)
       });
       const link = `${baseUrl}#/surprise?${params.toString()}`;
+      const qrOnlyParams = new URLSearchParams({
+        name,
+        date,
+        sender: sender || '你的贴心好友',
+        message: message || '',
+        photos: '[]'
+      });
+      const linkForQr = `${baseUrl}#/surprise?${qrOnlyParams.toString()}`;
       setGeneratedLink(link);
+      setQrLink(linkForQr);
       setIsGenerating(false);
     }, 2000);
   };
@@ -107,7 +114,7 @@ const Creator: React.FC = () => {
             </div>
           </div>
         ) : !generatedLink ? (
-          <form onSubmit={handleGenerate} className="space-y-6">
+          <form onSubmit={(e) => { e.preventDefault(); handleGenerate(); }} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-pink-400 font-bold text-xs ml-3 uppercase">1. 怎么称呼 TA</label>
@@ -158,7 +165,7 @@ const Creator: React.FC = () => {
               </div>
             </div>
 
-            <button type="submit" disabled={isUploading} 
+            <button type="button" disabled={isUploading} onClick={handleGenerate}
               className="w-full py-5 sanrio-btn text-white font-bold rounded-full shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 sparkle-btn">
               {isUploading ? '处理中...' : '亲手封存这份惊喜 🪄'}
             </button>
@@ -171,29 +178,31 @@ const Creator: React.FC = () => {
               <p className="text-pink-300 text-sm mt-2">快把链接或二维码发给 TA，扫码/打开即可看贺卡</p>
             </div>
 
-            <div className="flex flex-col items-center gap-3 p-6 bg-white/50 rounded-[30px] border-2 border-pink-100">
-              <p className="text-pink-500 font-chinese text-sm font-bold">扫码看贺卡</p>
-              <div className="p-4 bg-white rounded-2xl shadow-lg">
-                <QRCodeCanvas id="birthday-qr-canvas" value={generatedLink} size={200} level="M" />
-              </div>
-              <button onClick={saveQRCode} type="button"
-                className="py-3 px-6 rounded-full bg-pink-100 text-pink-600 font-chinese text-sm font-bold hover:bg-pink-200 transition-all">
-                保存二维码图片 📥
-              </button>
-            </div>
-            
             <div className="space-y-4 px-6">
-              <button onClick={() => window.location.hash = generatedLink.split('#')[1]} 
+              <button onClick={() => { const h = generatedLink.split('#')[1]; if (h) window.location.hash = h; }} 
                 className="w-full py-5 bg-white border-2 border-[#ff85a1] text-[#ff85a1] font-bold rounded-full hover:bg-pink-50 transition-all flex items-center justify-center gap-2">
                 立即预览魔法 👁️
               </button>
-              <button onClick={copyLink} 
+              <button onClick={copyLink} type="button"
                 className="w-full py-5 sanrio-btn text-white font-bold rounded-full shadow-lg flex items-center justify-center gap-2">
                 复制链接并分享 🔗
               </button>
             </div>
 
-            <button onClick={() => setGeneratedLink('')} className="text-pink-200 text-xs underline decoration-dotted">
+            {qrLink ? (
+              <div className="flex flex-col items-center gap-3 p-6 bg-white/50 rounded-[30px] border-2 border-pink-100">
+                <p className="text-pink-500 font-chinese text-sm font-bold">扫码看贺卡</p>
+                <div className="p-4 bg-white rounded-2xl shadow-lg">
+                  <QRCodeCanvas id="birthday-qr-canvas" value={qrLink} size={200} level="M" />
+                </div>
+                <button onClick={saveQRCode} type="button"
+                  className="py-3 px-6 rounded-full bg-pink-100 text-pink-600 font-chinese text-sm font-bold hover:bg-pink-200 transition-all">
+                  保存二维码图片 📥
+                </button>
+              </div>
+            ) : null}
+            
+            <button onClick={() => { setGeneratedLink(''); setQrLink(''); }} type="button" className="text-pink-200 text-xs underline decoration-dotted">
               返回重新定制
             </button>
           </div>

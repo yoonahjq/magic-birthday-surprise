@@ -138,10 +138,24 @@ const CardScene: React.FC<{ data: BirthdayData }> = ({ data }) => {
     };
   }, [step]);
 
-  // 降低吹气阈值，从 45 降到 30
+  // 吹气检测：提高阈值并需持续约 300ms 才触发，避免环境音误触
+  const blowThreshold = 55;
+  const blowSustainMs = 300;
+  const highVolumeSinceRef = useRef<number | null>(null);
   useEffect(() => {
-    if (step === CardStep.BLOW_CANDLE && volume > 30 && !isBlowing && !isCandleOut) {
-      handleBlow();
+    if (step !== CardStep.BLOW_CANDLE || isBlowing || isCandleOut) {
+      highVolumeSinceRef.current = null;
+      return;
+    }
+    if (volume > blowThreshold) {
+      const now = Date.now();
+      if (highVolumeSinceRef.current === null) highVolumeSinceRef.current = now;
+      else if (now - highVolumeSinceRef.current >= blowSustainMs) {
+        highVolumeSinceRef.current = null;
+        handleBlow();
+      }
+    } else {
+      highVolumeSinceRef.current = null;
     }
   }, [volume, step, isBlowing, isCandleOut]);
 
@@ -286,7 +300,7 @@ const CardScene: React.FC<{ data: BirthdayData }> = ({ data }) => {
                    <div className="flex flex-col gap-1">
                        <div className="flex justify-between text-xs font-chinese text-[#5a2e2e] font-bold px-1">
                           <span className="flex items-center gap-1">🎤 吹气能量值</span>
-                          <span>{Math.min(100, Math.round((volume / 30) * 100))}%</span>
+                          <span>{Math.min(100, Math.round((volume / blowThreshold) * 100))}%</span>
                        </div>
                        <div className="w-full h-6 rounded-full bg-slate-100 border border-slate-200 overflow-hidden relative shadow-inner">
                           {/* Background stripes */}
@@ -295,9 +309,9 @@ const CardScene: React.FC<{ data: BirthdayData }> = ({ data }) => {
                           {/* Bar */}
                           <div 
                             className="h-full bg-gradient-to-r from-blue-300 via-indigo-400 to-purple-500 transition-all duration-100 ease-out flex items-center justify-end pr-2" 
-                            style={{ width: `${Math.min(100, (volume / 30) * 100)}%` }} 
+                            style={{ width: `${Math.min(100, (volume / blowThreshold) * 100)}%` }} 
                           >
-                             {volume > 10 && <span className="text-[10px] text-white animate-pulse">💨</span>}
+                             {volume > blowThreshold * 0.5 && <span className="text-[10px] text-white animate-pulse">💨</span>}
                           </div>
                        </div>
                    </div>
