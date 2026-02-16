@@ -1,0 +1,8 @@
+{
+  "name": "Magic Birthday Surprise",
+  "description": "A highly interactive, personalized birthday card experience with falling cakes, cute animals, and blowing candles.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}

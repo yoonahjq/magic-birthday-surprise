@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎀 魔法生日惊喜 🎀</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sanrio-pink: #ffdae9;
+            --sanrio-dark-pink: #ff85a1;
+            --sanrio-blue: #d0f0ff;
+            --sanrio-purple: #e8dff5;
+            --sanrio-cream: #fffafc;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            /* Update: Use ZCOOL KuaiLe as the primary font for everything to ensure consistency */
+            font-family: 'ZCOOL KuaiLe', cursive, sans-serif;
+            background: var(--sanrio-cream);
+        }
+        .font-birthday { font-family: 'Pacifico', cursive; }
+        .font-chinese { font-family: 'ZCOOL KuaiLe', cursive; }
+        
+        /* Premium Soft UI */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border: 3px solid #ffffff;
+            box-shadow: 0 20px 50px rgba(255, 133, 161, 0.12);
+        }
+        .sanrio-gradient-text {
+            background: linear-gradient(135deg, #ff85a1 0%, #a18cd1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Cloud Animation */
+        @keyframes float-cloud {
+            0%, 100% { transform: translateX(0) translateY(0); opacity: 0.4; }
+            50% { transform: translateX(20px) translateY(-10px); opacity: 0.6; }
+        }
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            filter: blur(20px);
+            z-index: 0;
+            animation: float-cloud 8s ease-in-out infinite;
+        }
+
+        /* Ribbon Decoration */
+        .ribbon {
+            position: relative;
+            background: var(--sanrio-dark-pink);
+            color: white;
+            padding: 0.5rem 2rem;
+            clip-path: polygon(100% 0, 95% 50%, 100% 100%, 0% 100%, 5% 50%, 0% 0%);
+        }
+
+        /* Sparkle Cursor Effect (Simulated via CSS) */
+        .sparkle-btn:hover::after {
+            content: '✨';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            animation: bounce 1s infinite;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "@google/genai": "https://esm.sh/@google/genai@^1.41.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
