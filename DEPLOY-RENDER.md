@@ -47,10 +47,12 @@
    - **Build Command**：`npm install && npm run build`
    - **Publish Directory**：`dist`
 
-5. **环境变量（重要）**
-   - 展开 **Advanced**，点 **Add Environment Variable**
-   - Key：`GEMINI_API_KEY`
-   - Value：粘贴你的 Gemini API Key（和本地 `.env.local` 里的一样）
+5. **SPA 回退（微信 / 直接打开链接必做）**
+   - 在 **Redirects/Rewrites** 里添加一条 **Rewrite** 规则，否则 `/surprise?xxx` 会 404，微信里打不开：
+   - **Source Path**：`/*`
+   - **Destination Path**：`/index.html`
+   - **Action**：选 **Rewrite**（不是 Redirect）
+   - 这样任意路径都会返回 `index.html`，前端再根据路径显示贺卡。
 
 6. **创建站点**
    - 点 **Create Static Site**。
@@ -63,7 +65,7 @@
 
 - **链接**：把 Render 给的地址发出去即可，例如：  
   `https://你的站点名.onrender.com`
-- **二维码**：在「定制页」生成链接后，用页面上的「保存二维码」下载图片，发图给寿星，对方扫码就能打开贺卡。
+- **二维码**：在「定制页」生成链接后，用页面上的「保存二维码」下载图片，发图给寿星。链接已改为路径式（`/surprise?xxx`），**微信扫一扫可直接在微信内打开**，无需复制到浏览器。
 
 ---
 
@@ -73,7 +75,7 @@
 |------|------|
 | 构建失败 | 看 Render 的 **Logs**，确认 `Build Command` 是 `npm install && npm run build`，**Publish Directory** 是 `dist`。 |
 | 打开页面空白 | 确认 **Publish Directory** 填的是 `dist`，不要多写路径。 |
-| 祝福语不生成 / 报错 | 在 Render 的 **Environment** 里检查是否配置了 `GEMINI_API_KEY`，且没有多余空格。 |
+| 微信里打开是空白 / 404 | 检查是否在 **Redirects/Rewrites** 里添加了 `/*` → `/index.html` 的 **Rewrite** 规则。 |
 | 免费额度用完 | Render 免费静态站点一段时间不访问会“休眠”，再次打开时会自动唤醒，稍等几秒即可。 |
 
 ---

@@ -50,7 +50,7 @@ const Creator: React.FC = () => {
     if (!name || !date) return;
     setIsGenerating(true);
     setTimeout(() => {
-      const baseUrl = window.location.origin + (window.location.pathname.replace(/\/$/, '') || '') || window.location.origin;
+      const baseUrl = window.location.origin;
       const params = new URLSearchParams({
         name,
         date,
@@ -58,7 +58,7 @@ const Creator: React.FC = () => {
         message: message || '',
         photos: JSON.stringify(photos)
       });
-      const link = `${baseUrl}#/surprise?${params.toString()}`;
+      const link = `${baseUrl}/surprise?${params.toString()}`;
       const qrOnlyParams = new URLSearchParams({
         name,
         date,
@@ -66,7 +66,7 @@ const Creator: React.FC = () => {
         message: message || '',
         photos: '[]'
       });
-      const linkForQr = `${baseUrl}#/surprise?${qrOnlyParams.toString()}`;
+      const linkForQr = `${baseUrl}/surprise?${qrOnlyParams.toString()}`;
       setGeneratedLink(link);
       setQrLink(linkForQr);
       setIsGenerating(false);
@@ -179,7 +179,7 @@ const Creator: React.FC = () => {
             </div>
 
             <div className="space-y-4 px-6">
-              <button onClick={() => { const h = generatedLink.split('#')[1]; if (h) window.location.hash = h; }} 
+              <button onClick={() => { if (generatedLink) window.location.href = generatedLink; }} 
                 className="w-full py-5 bg-white border-2 border-[#ff85a1] text-[#ff85a1] font-bold rounded-full hover:bg-pink-50 transition-all flex items-center justify-center gap-2">
                 立即预览魔法 👁️
               </button>

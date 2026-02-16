@@ -58,6 +58,32 @@ const ARPhoto: React.FC<ARPhotoProps> = ({ onComplete, animalType, name }) => {
     };
   }, []);
 
+  // 把 emoji 画到主 canvas 上（先画到小 canvas 再贴图，保证各端都显示）
+  const drawEmojiSticker = (
+    ctx: CanvasRenderingContext2D,
+    emoji: string,
+    x: number,
+    y: number,
+    sizePx: number,
+    shadow = true
+  ) => {
+    const d = sizePx * 1.2;
+    const c = document.createElement('canvas');
+    c.width = d;
+    c.height = d;
+    const cctx = c.getContext('2d');
+    if (!cctx) return;
+    cctx.textAlign = 'center';
+    cctx.textBaseline = 'middle';
+    if (shadow) {
+      cctx.shadowBlur = 15;
+      cctx.shadowColor = 'rgba(0,0,0,0.25)';
+    }
+    cctx.font = `${sizePx}px Arial`;
+    cctx.fillText(emoji, d / 2, d / 2);
+    ctx.drawImage(c, x - d / 2, y - d / 2, d, d);
+  };
+
   const takePhoto = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -67,37 +93,30 @@ const ARPhoto: React.FC<ARPhotoProps> = ({ onComplete, animalType, name }) => {
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
+    const w = canvas.width;
+    const h = canvas.height;
 
-    ctx.translate(canvas.width, 0);
+    ctx.translate(w, 0);
     ctx.scale(-1, 1);
     ctx.drawImage(video, 0, 0);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 
     ctx.strokeStyle = 'white';
     ctx.lineWidth = 40;
-    ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+    ctx.strokeRect(20, 20, w - 40, h - 40);
 
-    // 绘制皇冠贴纸
-    ctx.font = '120px Arial';
-    ctx.textAlign = 'center';
-    ctx.shadowBlur = 20;
-    ctx.shadowColor = 'rgba(0,0,0,0.3)';
-    ctx.fillText('👑', canvas.width / 2, 160);
-    
-    // 绘制动物贴纸
-    ctx.font = '180px Arial';
+    // 三个贴纸都画到成片上并保留
+    drawEmojiSticker(ctx, '👑', w / 2, 100, 72);
     const animal = animalType === 'rabbit' ? '🐰' : animalType === 'cat' ? '🐱' : '🐻';
-    ctx.fillText(animal, 160, canvas.height - 100);
+    drawEmojiSticker(ctx, animal, 100, h - 70, 90);
+    drawEmojiSticker(ctx, '🎂', w - 120, h - 120, 80);
 
-    // 绘制蛋糕贴纸与名字
-    ctx.shadowBlur = 10;
-    ctx.font = '140px Arial';
-    ctx.fillText('🎂', canvas.width - 200, canvas.height - 180);
-    
     ctx.shadowBlur = 0;
     ctx.fillStyle = '#ff85a1';
-    ctx.font = 'bold 36px "ZCOOL KuaiLe"';
-    ctx.fillText(`${name}的专属惊喜`, canvas.width - 200, canvas.height - 80);
+    ctx.font = 'bold 26px "ZCOOL KuaiLe"';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`${name}的专属惊喜`, w - 120, h - 50);
 
     const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
     setCaptured(dataUrl);
@@ -140,17 +159,17 @@ const ARPhoto: React.FC<ARPhotoProps> = ({ onComplete, animalType, name }) => {
         
         {!captured && isCameraReady && (
           <>
-            <div className="absolute top-10 left-1/2 -translate-x-1/2 text-8xl animate-bounce pointer-events-none">👑</div>
-            <div className="absolute bottom-4 left-6 text-9xl pointer-events-none">{animalType === 'rabbit' ? '🐰' : animalType === 'cat' ? '🐱' : '🐻'}</div>
-            <div className="absolute bottom-20 right-6 flex flex-col items-center pointer-events-none">
-              <span className="text-8xl">🎂</span>
-              <span className="text-white bg-pink-400 px-3 py-1 rounded-full text-sm font-chinese shadow-sm mt-[-10px]">{name}的生日蛋糕</span>
+            <div className="absolute top-8 left-1/2 -translate-x-1/2 text-5xl animate-bounce pointer-events-none">👑</div>
+            <div className="absolute bottom-4 left-4 text-6xl pointer-events-none">{animalType === 'rabbit' ? '🐰' : animalType === 'cat' ? '🐱' : '🐻'}</div>
+            <div className="absolute bottom-16 right-4 flex flex-col items-center pointer-events-none">
+              <span className="text-5xl">🎂</span>
+              <span className="text-white bg-pink-400 px-2 py-0.5 rounded-full text-xs font-chinese shadow-sm mt-[-6px]">{name}的生日蛋糕</span>
             </div>
           </>
         )}
 
         {captured && (
-          <img src={captured} className="w-full h-full object-cover animate-in zoom-in duration-500" alt="Birthday Memory" />
+          <img src={captured} className="w-full h-full object-cover object-center animate-in zoom-in duration-500" alt="Birthday Memory" />
         )}
       </div>
 

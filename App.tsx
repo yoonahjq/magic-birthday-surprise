@@ -4,51 +4,51 @@ import Creator from './components/Creator';
 import CardScene from './components/CardScene';
 import { AppMode, BirthdayData } from './types';
 
+function parseSurpriseFromLocation(): { mode: AppMode; data: BirthdayData | null } {
+  const pathname = window.location.pathname;
+  const search = window.location.search;
+  if (pathname === '/surprise' && search) {
+    const params = new URLSearchParams(search);
+    const name = params.get('name');
+    const date = params.get('date');
+    const sender = params.get('sender');
+    const message = params.get('message');
+    const photosRaw = params.get('photos');
+    let photos: string[] = [];
+    try {
+      photos = photosRaw ? JSON.parse(photosRaw) : [];
+    } catch (e) {
+      console.error("Failed to parse photos", e);
+    }
+    if (name && date) {
+      return {
+        mode: AppMode.SURPRISE,
+        data: {
+          name: decodeURIComponent(name),
+          date: decodeURIComponent(date),
+          sender: sender ? decodeURIComponent(sender) : undefined,
+          message: message ? decodeURIComponent(message) : undefined,
+          photos,
+        },
+      };
+    }
+  }
+  return { mode: AppMode.CREATE, data: null };
+}
+
 const App: React.FC = () => {
   const [mode, setMode] = useState<AppMode>(AppMode.CREATE);
   const [data, setData] = useState<BirthdayData | null>(null);
 
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash;
-      if (hash.startsWith('#/surprise')) {
-        // 提取 ? 之后的内容进行解析
-        const searchStr = hash.split('?')[1];
-        if (searchStr) {
-          const params = new URLSearchParams(searchStr);
-          const name = params.get('name');
-          const date = params.get('date');
-          const sender = params.get('sender');
-          const message = params.get('message');
-          const photosRaw = params.get('photos');
-          
-          let photos = [];
-          try {
-            photos = photosRaw ? JSON.parse(photosRaw) : [];
-          } catch (e) {
-            console.error("Failed to parse photos", e);
-          }
-
-          if (name && date) {
-            setData({ 
-              name: decodeURIComponent(name), 
-              date: decodeURIComponent(date), 
-              sender: sender ? decodeURIComponent(sender) : undefined, 
-              message: message ? decodeURIComponent(message) : undefined,
-              photos 
-            });
-            setMode(AppMode.SURPRISE);
-            return;
-          }
-        }
-      }
-      setMode(AppMode.CREATE);
+    const syncFromLocation = () => {
+      const { mode: nextMode, data: nextData } = parseSurpriseFromLocation();
+      setMode(nextMode);
+      setData(nextData);
     };
-
-    window.addEventListener('hashchange', handleHashChange);
-    handleHashChange();
-
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    syncFromLocation();
+    window.addEventListener('popstate', syncFromLocation);
+    return () => window.removeEventListener('popstate', syncFromLocation);
   }, []);
 
   return (

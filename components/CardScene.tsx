@@ -139,8 +139,8 @@ const CardScene: React.FC<{ data: BirthdayData }> = ({ data }) => {
   }, [step]);
 
   // 吹气检测：提高阈值并需持续约 300ms 才触发，避免环境音误触
-  const blowThreshold = 45;
-  const blowSustainMs = 250;
+  const blowThreshold = 36;
+  const blowSustainMs = 200;
   const highVolumeSinceRef = useRef<number | null>(null);
   useEffect(() => {
     if (step !== CardStep.BLOW_CANDLE || isBlowing || isCandleOut) {

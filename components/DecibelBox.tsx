@@ -13,10 +13,10 @@ const DecibelBox: React.FC<DecibelBoxProps> = ({ volume, onComplete, name }) => 
 
   useEffect(() => {
     if (isBroken) return;
-    // 提高灵敏度：将门槛从 40 降至 25，增加积累倍率
-    if (volume > 25) {
+    // 大喊更灵敏：门槛降至 18，积累更快
+    if (volume > 18) {
       setShaking(prev => {
-        const next = prev + (volume / 12); 
+        const next = prev + (volume / 10);
         if (next >= 100) {
           setIsBroken(true);
           setTimeout(onComplete, 3000);
@@ -24,8 +24,7 @@ const DecibelBox: React.FC<DecibelBoxProps> = ({ volume, onComplete, name }) => 
         return next;
       });
     } else {
-      // 缓慢回退进度，防止太难
-      setShaking(prev => Math.max(0, prev - 0.5));
+      setShaking(prev => Math.max(0, prev - 0.4));
     }
   }, [volume, isBroken, onComplete]);
 
@@ -37,7 +36,7 @@ const DecibelBox: React.FC<DecibelBoxProps> = ({ volume, onComplete, name }) => 
             className="relative w-64 h-64 flex items-center justify-center cursor-pointer transition-transform"
             style={{ 
               transform: `scale(${1 + volume/150}) rotate(${Math.sin(Date.now()/50) * (volume/8)}deg)`,
-              animation: volume > 20 ? 'jitter 0.1s infinite' : 'none'
+              animation: volume > 15 ? 'jitter 0.1s infinite' : 'none'
             }}
           >
             <div className="absolute inset-0 bg-pink-400 rounded-3xl shadow-2xl flex items-center justify-center text-8xl">🎁</div>
