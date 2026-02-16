@@ -73,7 +73,7 @@ const Creator: React.FC = () => {
       setGeneratedLink(link);
       setQrLink(linkForQr);
       setIsGenerating(false);
-      markCodeUsed(); // 一码一张：封存成功即消耗该序列号
+      markCodeUsed({ link, qrLink: linkForQr }); // 一码一张 + 存链接，方便用序列号找回贺卡
     }, 2000);
   };
 

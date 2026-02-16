@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { QRCodeCanvas } from 'qrcode.react';
 
 import codeHashes from '../code-hashes.json';
 
@@ -7,6 +8,7 @@ const PENDING_HASH_KEY = 'serial_pending_hash';
 const CARD_DONE_KEY = 'serial_card_done';
 const JUST_CONSUMED_KEY = 'serial_just_consumed';
 export const USED_PREFIX = 'mb_used_';
+const CARD_PREFIX = 'mb_card_';
 
 export function isSerialVerified(): boolean {
   return sessionStorage.getItem(STORAGE_KEY) === 'true';
@@ -21,11 +23,14 @@ export function isCodeConsumedThisSession(): boolean {
   return sessionStorage.getItem(CARD_DONE_KEY) === 'true';
 }
 
-/** 封存成功时调用：把本会话的序列号标为已用，之后该码不可再进 */
-export function markCodeUsed(): void {
+export type SavedCardPayload = { link: string; qrLink?: string };
+
+/** 封存成功时调用：把本会话的序列号标为已用，并保存贺卡链接供之后用同一序列号找回 */
+export function markCodeUsed(payload?: SavedCardPayload): void {
   const hash = sessionStorage.getItem(PENDING_HASH_KEY);
   if (hash) {
     localStorage.setItem(USED_PREFIX + hash, 'true');
+    if (payload) localStorage.setItem(CARD_PREFIX + hash, JSON.stringify(payload));
     sessionStorage.removeItem(PENDING_HASH_KEY);
     sessionStorage.setItem(CARD_DONE_KEY, 'true');
   }
@@ -59,6 +64,7 @@ const SerialGate: React.FC<Props> = ({ onVerified }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<'invalid' | 'used' | 'empty' | null>(null);
   const [showConsumedMsg] = useState(() => consumeJustConsumedMessage());
+  const [savedCard, setSavedCard] = useState<SavedCardPayload | null>(null);
 
   if (!hasHashes) {
     return (
@@ -86,6 +92,18 @@ const SerialGate: React.FC<Props> = ({ onVerified }) => {
       }
       const usedKey = USED_PREFIX + hash;
       if (localStorage.getItem(usedKey) === 'true') {
+        const cardRaw = localStorage.getItem(CARD_PREFIX + hash);
+        if (cardRaw) {
+          try {
+            const card = JSON.parse(cardRaw) as SavedCardPayload;
+            if (card?.link) {
+              setSavedCard(card);
+              setError(null);
+              setLoading(false);
+              return;
+            }
+          } catch (_) {}
+        }
         setError('used');
         setLoading(false);
         return;
@@ -154,6 +172,60 @@ const SerialGate: React.FC<Props> = ({ onVerified }) => {
             {loading ? '验证中...' : '验证并进入定制 🎀'}
           </button>
         </form>
+
+        {savedCard ? (
+          <div className="mt-8 pt-8 border-t border-pink-100 space-y-6 animate-in fade-in duration-300">
+            <h2 className="text-xl font-chinese text-pink-500 text-center">您的贺卡</h2>
+            <p className="text-pink-300 text-sm font-chinese text-center">用本序列号可随时找回链接与二维码，无需再麻烦客服</p>
+            <div className="flex flex-col gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(savedCard.link);
+                  alert('链接已复制，可粘贴分享给 TA');
+                }}
+                className="w-full py-3 rounded-full bg-pink-50 text-pink-600 font-chinese text-sm font-bold hover:bg-pink-100 transition-all"
+              >
+                复制分享链接
+              </button>
+              <button
+                type="button"
+                onClick={() => { window.location.href = savedCard.link; }}
+                className="w-full py-3 rounded-full sanrio-btn text-white font-chinese text-sm font-bold hover:opacity-90 transition-all"
+              >
+                打开贺卡页面
+              </button>
+            </div>
+            {(savedCard.qrLink || savedCard.link) && (
+              <div id="recovery-qr" className="flex flex-col items-center gap-2 p-4 bg-white/50 rounded-2xl border border-pink-100">
+                <p className="text-pink-500 font-chinese text-xs font-bold">扫码或点上方链接打开</p>
+                <QRCodeCanvas value={savedCard.qrLink || savedCard.link} size={160} level="M" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const canvas = document.querySelector('#recovery-qr canvas') as HTMLCanvasElement | null;
+                    if (canvas) {
+                      const a = document.createElement('a');
+                      a.href = canvas.toDataURL('image/png');
+                      a.download = '生日惊喜二维码.png';
+                      a.click();
+                    }
+                  }}
+                  className="py-2 px-4 rounded-full bg-pink-100 text-pink-600 font-chinese text-xs font-bold"
+                >
+                  保存二维码图片
+                </button>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => setSavedCard(null)}
+              className="text-pink-300 text-xs font-chinese underline"
+            >
+              返回输入序列号
+            </button>
+          </div>
+        ) : null}
       </div>
 
       <style>{`
