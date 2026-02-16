@@ -201,6 +201,49 @@ const CardScene: React.FC<{ data: BirthdayData }> = ({ data }) => {
     return 'bg-[#fffafc]';
   };
 
+  const handleSkipToNext = () => {
+    switch (step) {
+      case CardStep.GATHER_LIGHT:
+        setStep(CardStep.DECIBEL_BOX);
+        break;
+      case CardStep.DECIBEL_BOX:
+        setStep(CardStep.ANIMALS);
+        break;
+      case CardStep.ANIMALS:
+        setRevealedAnimals([0, 1, 2]);
+        setSelectedAnimal('bear');
+        setStep(CardStep.TIME_TRAJECTORY);
+        break;
+      case CardStep.TIME_TRAJECTORY:
+        setStep(data.photos?.length ? CardStep.SCRATCH_PHOTO : CardStep.WISH_WELL);
+        break;
+      case CardStep.SCRATCH_PHOTO:
+        setStep(CardStep.WISH_WELL);
+        break;
+      case CardStep.WISH_WELL:
+        setStep(CardStep.CAKE_STACK);
+        break;
+      case CardStep.CAKE_STACK:
+        setStackCount(2);
+        setStep(CardStep.BLOW_CANDLE);
+        break;
+      case CardStep.BLOW_CANDLE:
+        if (!isCandleOut) {
+          setIsBlowing(true);
+          setIsCandleOut(true);
+        }
+        setTimeout(() => setStep(CardStep.AR_PHOTO), 800);
+        break;
+      case CardStep.AR_PHOTO:
+        setStep(CardStep.FINAL_LETTER);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const showSkipButton = step !== CardStep.COUNTDOWN && step !== CardStep.FINAL_LETTER;
+
   return (
     <div className={`relative w-full h-screen overflow-hidden transition-all duration-1000 ${getBgClass()} ${isShaking ? 'animate-shake' : ''}`}>
       {step > CardStep.COUNTDOWN && (
@@ -216,6 +259,16 @@ const CardScene: React.FC<{ data: BirthdayData }> = ({ data }) => {
           }}
           className={`fixed top-6 right-6 z-[100] w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-xl ${musicPlaying ? 'bg-pink-100 text-pink-500 animate-spin-slow' : 'bg-gray-200 text-gray-500'}`}>
           {musicPlaying ? '🎵' : '🔇'}
+        </button>
+      )}
+
+      {showSkipButton && (
+        <button
+          type="button"
+          onClick={handleSkipToNext}
+          className="fixed bottom-6 left-6 z-[100] px-4 py-2 rounded-full bg-black/20 text-white/90 text-xs font-chinese backdrop-blur-sm border border-white/30 shadow-lg hover:bg-black/30 transition-all"
+        >
+          卡住了？跳过此步 →
         </button>
       )}
 

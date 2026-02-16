@@ -47,12 +47,13 @@ const Cake: React.FC<CakeProps> = ({ manualLayers, isCandleOut, isBlowing }) => 
             <div className="w-full h-full bg-gradient-to-t from-orange-600 via-yellow-400 to-yellow-100 rounded-full blur-[1px] animate-flame"></div>
         </div>
         
-        {/* Smoke Effect - Enhanced with multiple particles */}
+        {/* 蜡烛熄灭后的烟效 */}
         {isCandleOut && (
           <div className="absolute -top-12 left-1/2 -translate-x-1/2 overflow-visible pointer-events-none" style={{ zIndex: 59 }}>
-             <div className="absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-gray-400 rounded-full animate-smoke-1 opacity-0 blur-sm"></div>
-             <div className="absolute left-1/2 -translate-x-1/2 w-6 h-6 bg-gray-300 rounded-full animate-smoke-2 opacity-0 blur-md" style={{ animationDelay: '0.1s' }}></div>
-             <div className="absolute left-1/2 -translate-x-1/2 w-3 h-8 bg-gray-400/50 rounded-full animate-smoke-3 opacity-0 blur-sm" style={{ animationDelay: '0.2s' }}></div>
+             <div className="absolute left-1/2 -translate-x-1/2 w-6 h-6 bg-gray-400/80 rounded-full animate-smoke-1 blur-[4px]"></div>
+             <div className="absolute left-1/2 -translate-x-1/2 w-10 h-10 bg-gray-300/70 rounded-full animate-smoke-2 blur-[8px]" style={{ animationDelay: '0.15s' }}></div>
+             <div className="absolute left-1/2 -translate-x-1/2 w-4 h-12 bg-gray-400/60 rounded-full animate-smoke-3 blur-[4px]" style={{ animationDelay: '0.3s' }}></div>
+             <div className="absolute left-1/2 -translate-x-1/2 w-8 h-8 bg-gray-300/50 rounded-full animate-smoke-1 blur-[6px]" style={{ animationDelay: '0.4s' }}></div>
           </div>
         )}
 
@@ -153,19 +154,19 @@ const Cake: React.FC<CakeProps> = ({ manualLayers, isCandleOut, isBlowing }) => 
           50% { transform: scale(1.1, 1.2) rotate(2deg); opacity: 1; } 
         }
         @keyframes smoke-1 {
-          0% { opacity: 0; transform: translate(-50%, 0) scale(0.5); }
-          20% { opacity: 0.6; }
-          100% { opacity: 0; transform: translate(-60%, -80px) scale(2); }
+          0% { opacity: 0; transform: translate(-50%, 0) scale(0.3); }
+          15% { opacity: 0.85; transform: translate(-50%, -10px) scale(0.8); }
+          100% { opacity: 0; transform: translate(-55%, -100px) scale(2.2); }
         }
         @keyframes smoke-2 {
-          0% { opacity: 0; transform: translate(-50%, 0) scale(0.5); }
-          30% { opacity: 0.5; }
-          100% { opacity: 0; transform: translate(-40%, -100px) scale(2.5); }
+          0% { opacity: 0; transform: translate(-50%, 0) scale(0.3); }
+          25% { opacity: 0.75; transform: translate(-50%, -20px) scale(0.9); }
+          100% { opacity: 0; transform: translate(-45%, -120px) scale(2.5); }
         }
         @keyframes smoke-3 {
-          0% { opacity: 0; height: 10px; transform: translate(-50%, 0); }
-          20% { opacity: 0.4; }
-          100% { opacity: 0; height: 120px; transform: translate(-50%, -60px); }
+          0% { opacity: 0; height: 8px; transform: translate(-50%, 0); }
+          20% { opacity: 0.7; height: 20px; transform: translate(-50%, -15px); }
+          100% { opacity: 0; height: 100px; transform: translate(-50%, -80px); }
         }
         @keyframes float-heart {
           0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
