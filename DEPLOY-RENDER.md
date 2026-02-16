@@ -54,18 +54,25 @@
    - **Action**：选 **Rewrite**（不是 Redirect）
    - 这样任意路径都会返回 `index.html`，前端再根据路径显示贺卡。
 
-6. **创建站点**
+6. **（可选）用自己的域名，让生成的链接/二维码都是你的域名**
+   - 在 **Environment** 里添加变量：
+   - **Key**：`VITE_SHARE_BASE_URL`
+   - **Value**：你的访问地址，例如 `https://birthday.yoona.ltd`（不要末尾斜杠）
+   - 保存后 **重新部署**（Deploy → Clear build cache & deploy 或 重新 push 代码触发部署）。之后在站内「封存」生成的链接和二维码都会用这个域名，而不是 onrender.com。
+
+7. **创建站点**
    - 点 **Create Static Site**。
    - 等几分钟，构建完成后会给你一个地址，例如：  
      `https://magic-birthday-surprise.onrender.com`
+   - 若已绑定自定义域名（如 birthday.yoona.ltd），也可用该域名访问。
 
 ---
 
 ## 三、分享给别人
 
-- **链接**：把 Render 给的地址发出去即可，例如：  
-  `https://你的站点名.onrender.com`
-- **二维码**：在「定制页」生成链接后，用页面上的「保存二维码」下载图片，发图给寿星。链接已改为路径式（`/surprise?xxx`），**微信扫一扫可直接在微信内打开**，无需复制到浏览器。
+- **链接**：用你的域名或 Render 地址发出去即可，例如：  
+  `https://birthday.yoona.ltd` 或 `https://你的站点名.onrender.com`
+- **二维码**：在「定制页」生成链接后，用页面上的「保存二维码」下载图片。若已配置 `VITE_SHARE_BASE_URL` 为你的域名，生成的链接和二维码都会是你的域名。
 
 ---
 

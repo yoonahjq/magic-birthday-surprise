@@ -50,7 +50,9 @@ const Creator: React.FC = () => {
     if (!name || !date) return;
     setIsGenerating(true);
     setTimeout(() => {
-      const baseUrl = window.location.origin;
+      // 优先用配置的分享域名（如 https://birthday.yoona.ltd），否则用当前访问的域名
+      const shareOrigin = (import.meta.env.VITE_SHARE_BASE_URL || '').replace(/\/$/, '');
+      const baseUrl = shareOrigin || window.location.origin;
       const params = new URLSearchParams({
         name,
         date,
