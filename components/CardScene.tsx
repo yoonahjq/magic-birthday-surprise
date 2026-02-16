@@ -139,8 +139,8 @@ const CardScene: React.FC<{ data: BirthdayData }> = ({ data }) => {
   }, [step]);
 
   // 吹气检测：提高阈值并需持续约 300ms 才触发，避免环境音误触
-  const blowThreshold = 55;
-  const blowSustainMs = 300;
+  const blowThreshold = 45;
+  const blowSustainMs = 250;
   const highVolumeSinceRef = useRef<number | null>(null);
   useEffect(() => {
     if (step !== CardStep.BLOW_CANDLE || isBlowing || isCandleOut) {
@@ -263,8 +263,8 @@ const CardScene: React.FC<{ data: BirthdayData }> = ({ data }) => {
           }
         }}>
           <h2 className="text-4xl font-chinese text-[#5a2e2e] mb-2 animate-bounce">天降甜蜜惊喜！🍰</h2>
-          {/* 将蛋糕整体下移 translate-y-20，确保顶部蜡烛可见 */}
-          <div className="flex justify-center items-end w-full h-[65vh] overflow-visible translate-y-20 transform">
+          {/* 蛋糕整体下移，确保顶部蜡烛可见 */}
+          <div className="flex justify-center items-end w-full h-[65vh] overflow-visible translate-y-32 transform">
             <Cake manualLayers={stackCount} />
           </div>
           <p className="text-[#8fbcdb] font-chinese mt-20 opacity-80 animate-pulse text-xl">
@@ -285,9 +285,9 @@ const CardScene: React.FC<{ data: BirthdayData }> = ({ data }) => {
             </p>
           </div>
 
-          {/* Cake Layer - Absolute Center/Bottom */}
-          <div className="absolute inset-0 flex items-end justify-center z-10 pb-32 md:pb-20 overflow-visible pointer-events-none">
-             <div className="transform scale-90 md:scale-100 origin-bottom mb-10">
+          {/* Cake Layer - Absolute Center/Bottom，整体下移 */}
+          <div className="absolute inset-0 flex items-end justify-center z-10 pb-20 md:pb-12 overflow-visible pointer-events-none">
+             <div className="transform scale-90 md:scale-100 origin-bottom mb-4">
                 <Cake manualLayers={2} isCandleOut={isCandleOut} isBlowing={isBlowing} />
              </div>
           </div>

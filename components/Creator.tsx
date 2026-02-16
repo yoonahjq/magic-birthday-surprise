@@ -175,7 +175,7 @@ const Creator: React.FC = () => {
             <div className="flex flex-col items-center">
               <div className="text-8xl animate-bounce mb-4">✨🎀✨</div>
               <h2 className="text-3xl font-chinese text-pink-500">记忆封箱成功！</h2>
-              <p className="text-pink-300 text-sm mt-2">快把链接或二维码发给 TA，扫码/打开即可看贺卡</p>
+              <p className="text-pink-300 text-sm mt-2">快把链接或二维码发给 TA，微信扫一扫可直接在微信里打开看贺卡</p>
             </div>
 
             <div className="space-y-4 px-6">
@@ -191,7 +191,7 @@ const Creator: React.FC = () => {
 
             {qrLink ? (
               <div className="flex flex-col items-center gap-3 p-6 bg-white/50 rounded-[30px] border-2 border-pink-100">
-                <p className="text-pink-500 font-chinese text-sm font-bold">扫码看贺卡</p>
+                <p className="text-pink-500 font-chinese text-sm font-bold">扫码看贺卡（支持微信内打开）</p>
                 <div className="p-4 bg-white rounded-2xl shadow-lg">
                   <QRCodeCanvas id="birthday-qr-canvas" value={qrLink} size={200} level="M" />
                 </div>
