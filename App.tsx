@@ -4,11 +4,26 @@ import Creator from './components/Creator';
 import CardScene from './components/CardScene';
 import { AppMode, BirthdayData } from './types';
 
+const PREVIEW_STORAGE_KEY = 'birthday_surprise_preview';
+
 function parseSurpriseFromLocation(): { mode: AppMode; data: BirthdayData | null } {
   const pathname = window.location.pathname;
   const search = window.location.search;
   if (pathname === '/surprise' && search) {
     const params = new URLSearchParams(search);
+    const isPreview = params.get('preview') === '1';
+    if (isPreview) {
+      try {
+        const raw = sessionStorage.getItem(PREVIEW_STORAGE_KEY);
+        if (raw) {
+          const data = JSON.parse(raw) as BirthdayData;
+          sessionStorage.removeItem(PREVIEW_STORAGE_KEY);
+          if (data.name && data.date) return { mode: AppMode.SURPRISE, data };
+        }
+      } catch (e) {
+        console.error("Preview data parse failed", e);
+      }
+    }
     const name = params.get('name');
     const date = params.get('date');
     const sender = params.get('sender');

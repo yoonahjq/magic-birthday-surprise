@@ -184,17 +184,26 @@ const Creator: React.FC = () => {
               <button
                 onClick={() => {
                   if (!generatedLink) return;
-                  // 链接过长（含照片 base64）会触发 HTTP 431，预览改用短链接
                   const maxUrlLen = 2000;
-                  const previewUrl = generatedLink.length > maxUrlLen ? (qrLink || generatedLink) : generatedLink;
-                  window.location.href = previewUrl;
+                  if (generatedLink.length > maxUrlLen && qrLink) {
+                    sessionStorage.setItem('birthday_surprise_preview', JSON.stringify({
+                      name,
+                      date,
+                      sender: sender || '你的贴心好友',
+                      message: message || '',
+                      photos,
+                    }));
+                    window.location.href = qrLink + (qrLink.includes('?') ? '&' : '?') + 'preview=1';
+                  } else {
+                    window.location.href = generatedLink;
+                  }
                 }}
                 className="w-full py-5 bg-white border-2 border-[#ff85a1] text-[#ff85a1] font-bold rounded-full hover:bg-pink-50 transition-all flex items-center justify-center gap-2"
               >
                 立即预览魔法 👁️
               </button>
               {generatedLink.length > 2000 && (
-                <p className="text-xs text-pink-300 font-chinese -mt-2">预览为无照片版本，分享/复制的链接含照片</p>
+                <p className="text-xs text-pink-300 font-chinese -mt-2">预览会保留照片与刮刮乐；分享链接含照片，对方打开可见</p>
               )}
               <button onClick={copyLink} type="button"
                 className="w-full py-5 sanrio-btn text-white font-bold rounded-full shadow-lg flex items-center justify-center gap-2">
