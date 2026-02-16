@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# 序列号明文列表（仅自己保存并发给下单用户，勿提交）
+codes.txt
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

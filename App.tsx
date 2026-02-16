@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import Creator from './components/Creator';
 import CardScene from './components/CardScene';
+import SerialGate, { isSerialVerified, hasHashes } from './components/SerialGate';
 import { AppMode, BirthdayData } from './types';
 
 const PREVIEW_STORAGE_KEY = 'birthday_surprise_preview';
@@ -54,6 +54,7 @@ function parseSurpriseFromLocation(): { mode: AppMode; data: BirthdayData | null
 const App: React.FC = () => {
   const [mode, setMode] = useState<AppMode>(AppMode.CREATE);
   const [data, setData] = useState<BirthdayData | null>(null);
+  const [showCreator, setShowCreator] = useState(() => !hasHashes || isSerialVerified());
 
   useEffect(() => {
     const syncFromLocation = () => {
@@ -63,15 +64,24 @@ const App: React.FC = () => {
     };
     syncFromLocation();
     window.addEventListener('popstate', syncFromLocation);
-    return () => window.removeEventListener('popstate', syncFromLocation);
+    const onConsumed = () => setShowCreator(false);
+    window.addEventListener('serial-consumed', onConsumed);
+    return () => {
+      window.removeEventListener('popstate', syncFromLocation);
+      window.removeEventListener('serial-consumed', onConsumed);
+    };
   }, []);
+
+  const needGate = mode === AppMode.CREATE && hasHashes && !showCreator;
 
   return (
     <div className="min-h-screen bg-[#fffafc] relative overflow-hidden">
-      {mode === AppMode.CREATE ? (
+      {needGate ? (
+        <SerialGate onVerified={() => setShowCreator(true)} />
+      ) : mode === AppMode.CREATE ? (
         <Creator />
       ) : (
-        data && <CardScene data={data} />
+        data ? <CardScene data={data} /> : null
       )}
       
       <div className="fixed inset-0 pointer-events-none z-0">

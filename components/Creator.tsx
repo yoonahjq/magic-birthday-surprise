@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
+import { markCodeUsed, isCodeConsumedThisSession, setJustConsumedMessage } from './SerialGate';
 
 const Creator: React.FC = () => {
   const [name, setName] = useState('');
@@ -72,6 +73,7 @@ const Creator: React.FC = () => {
       setGeneratedLink(link);
       setQrLink(linkForQr);
       setIsGenerating(false);
+      markCodeUsed(); // 一码一张：封存成功即消耗该序列号
     }, 2000);
   };
 
@@ -224,7 +226,21 @@ const Creator: React.FC = () => {
               </div>
             ) : null}
             
-            <button onClick={() => { setGeneratedLink(''); setQrLink(''); }} type="button" className="text-pink-200 text-xs underline decoration-dotted">
+            <button
+              onClick={() => {
+                if (isCodeConsumedThisSession()) {
+                  sessionStorage.removeItem('serial_verified');
+                  sessionStorage.removeItem('serial_card_done');
+                  setJustConsumedMessage();
+                  window.dispatchEvent(new CustomEvent('serial-consumed'));
+                  return;
+                }
+                setGeneratedLink('');
+                setQrLink('');
+              }}
+              type="button"
+              className="text-pink-200 text-xs underline decoration-dotted"
+            >
               返回重新定制
             </button>
           </div>
